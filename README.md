@@ -3,6 +3,7 @@
 A collection of shell scripts for productivity and automation on Arch Linux or other distros (but I use arch btw).
 
 ## Environment
+!!!Different terminals or editors will cause problems. Adjust manually!!!
 
 * **OS:** Arch Linux
 * **Shell:** Bash
