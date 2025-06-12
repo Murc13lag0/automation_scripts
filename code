@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+proj="$*"
+base="$HOME/code/$proj"
+[[ -d $base/src ]] && target="$base/src" || target="$base"
+(( ! -d $target )) && { echo "Error: '$target' not found" >&2; exit 1; }
+
+read SCR_W SCR_H < <(
+  xrandr | awk '/\*/{split($1,r,"x"); print r[1],r[2]; exit}'
+)
+HALF_W=$((SCR_W/2))
+
+shopt -s nullglob
+dirs=("$target"/*/)
+
+if (( ${#dirs[@]} >= 2 )); then
+  for i in {0..1}; do
+    d=${dirs[i]}
+    alacritty --title "${i}" --working-directory "$d" -e nvim "$d" &
+    sleep 0.1
+    wid=$(wmctrl -lx | awk -v t="${i}" '$3==t{print $1;exit}')
+    wmctrl -ir "$wid" -e "0,$((i*HALF_W)),0,$HALF_W,$SCR_H"
+  done
+  for ((i=2;i<${#dirs[@]};i++)); do
+    alacritty --working-directory "${dirs[i]}" -e nvim "${dirs[i]}" &
+  done
+else
+  alacritty --working-directory "$target" -e nvim "$target" &
+fi
